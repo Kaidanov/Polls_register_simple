@@ -11,7 +11,7 @@ http://www.djangobook.com/en/2.0/chapter14.html
 
 Adding 
 
-'''
+```python
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
@@ -28,4 +28,6 @@ def register(request):
     return render(request, "registration/register.html", {
         'form': form,
     })
-'''
+```
+
+
