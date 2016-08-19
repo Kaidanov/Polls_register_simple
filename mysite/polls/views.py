@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 
 from .models import Choice, Question
 
@@ -26,11 +27,29 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             new_user = form.save()
+#             return HttpResponseRedirect("/polls/")
+#     else:
+#         form = UserCreationForm()
+#     return render(request, "registration/register.html", {
+#         'form': form,
+#     })
+
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            login(request, new_user)
             return HttpResponseRedirect("/polls/")
     else:
         form = UserCreationForm()
@@ -38,7 +57,7 @@ def register(request):
         'form': form,
     })
 
-
+@login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
@@ -57,17 +76,17 @@ def vote(request, question_id):
         # user hits the Back button.
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
-# def index(request):
-#     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-#     context = {'latest_question_list': latest_question_list}
-#     return render(request, 'polls/index.html', context)
-#
-# def results(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, 'polls/results.html', {'question': question})
+        # def index(request):
+        #     latest_question_list = Question.objects.order_by('-pub_date')[:5]
+        #     context = {'latest_question_list': latest_question_list}
+        #     return render(request, 'polls/index.html', context)
+        #
+        # def results(request, question_id):
+        #     question = get_object_or_404(Question, pk=question_id)
+        #     return render(request, 'polls/results.html', {'question': question})
 
 
 
-# def detail(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, 'polls/detail.html', {'question': question})
+        # def detail(request, question_id):
+        #     question = get_object_or_404(Question, pk=question_id)
+        #     return render(request, 'polls/detail.html', {'question': question})
